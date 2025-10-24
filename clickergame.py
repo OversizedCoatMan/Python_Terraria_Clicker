@@ -1,6 +1,6 @@
 import pygame
 import sqlite3
-
+import tkinter as tk
 #pygame display settings
 screen_width = 500
 screen_height = 500
@@ -11,21 +11,23 @@ pygame.display.set_caption("clicker")
 # database create file and table
 con = sqlite3.connect("stats.db")
 cur = con.cursor()
-cur.execute("CREATE TABLE IF NOT EXISTS scores(points REAL, perclick REAL, cps REAL, upgrade1 REAL, upgrade2 REAL)")
+cur.execute("CREATE TABLE IF NOT EXISTS scores(points REAL, perclick REAL, cps REAL, totalclicks REAL, totaltime REAL, upgrade1 REAL, upgrade2 REAL)")
 
 # reads the data from database
-cur.execute("SELECT points, perclick, cps, upgrade1, upgrade2 FROM scores ORDER BY rowid DESC LIMIT 1")
+cur.execute("SELECT points, perclick, cps, totalclicks, totaltime, upgrade1, upgrade2 FROM scores ORDER BY rowid DESC LIMIT 1")
 row = cur.fetchone()
 
 #set the variables to the read data, if there is no data than set to default values
 if row:
-    points, increase_on_click, clicks_per_second, isupgrade1, isupgrade2 = row
+    points, increase_on_click, clicks_per_second, totalclicks, totaltime, isupgrade1, isupgrade2 = row
     isupgrade1 = bool(isupgrade1)
     isupgrade2 = bool(isupgrade2)
 else:
-    points = 500
+    points = 0
     increase_on_click = 1
     clicks_per_second = 0
+    totalclicks = 0
+    totaltime = 0
     isupgrade1 = False
     isupgrade2 = False
 
@@ -38,6 +40,7 @@ upgrade2 = pygame.image.load("Copper_Broadsword.png").convert_alpha()
 click_per_sec1 = pygame.image.load("Finch_Staff.png").convert_alpha()
 click_per_sec2 = pygame.image.load("Flinx_Staff.png").convert_alpha()
 no = pygame.image.load("Red X.png").convert_alpha()
+statimg = pygame.image.load("statsbtn.png").convert_alpha()
 
 
 
@@ -90,8 +93,9 @@ class BUTTON:
         for event in events:
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if self.rect.collidepoint(pos):
-                    global points, increase_on_click, text_surface
+                    global points, increase_on_click, text_surface, totalclicks
                     points += increase_on_click
+                    totalclicks = int(totalclicks) + 1
                     screen.fill(pygame.Color("black"), (10, 10, 100, 25))
                     text_surface = font2.render(str(points), True, (255, 255, 255))
                     screen.blit(text_surface, (10, 10))
@@ -154,19 +158,45 @@ class BUTTON:
                     screen.blit(text_surface, (10, 10))
         screen.blit(self.image, (self.rect.x, self.rect.y))
 
+    def statistics(self, events):
+        global totalclicks, totaltime, time1
+        pos = pygame.mouse.get_pos()
+        if self.rect.collidepoint(pos):
+            for event in events:
+                if event.type ==pygame.MOUSEBUTTONDOWN and event.button ==1:
+                    totalclicks = int(totalclicks)
+                    stats_window = tk.Tk()
+                    stats_window.geometry("500x500")
+                    stats_window.title("statistics")
+                    stats_window.configure(background="Black")
+                    label = tk.Label(stats_window, text="statistics", font=("Arial", 24))
+                    label.pack(padx=10, pady=10)
+                    totalclk = tk.Label(stats_window, text = f"Total Clicks: {totalclicks}", font = ("Arial", 20))
+                    totalclk.pack(padx=10, pady=10)
+                    totaltime = int(totaltime)
+                    totaltimel = tk.Label(stats_window, text = f"Total Time: {totaltime}", font = ("Arial", 20))
+                    totaltimel.pack(padx=10, pady=10)
+                    stats_window.mainloop()
+
+
+        screen.blit(self.image, (self.rect.x, self.rect.y))
 #the buttons
 clickbtn = BUTTON(25, 50, click_img, 2.5, True)
 upgrade1btn = BUTTON(434, 45, upgrade1, scale=1.9, held=True)
 upgrade2btn = BUTTON(434, 140, upgrade2, scale=1.85, held=True)
 auto1 = BUTTON(333, 45, click_per_sec1, scale=1.6, held=True)
 auto2 = BUTTON(333, 140, click_per_sec2, scale=1.6, held=True)
+statsbtn = BUTTON(10,368, statimg, scale=1.6, held=True)
 screen.blit(upgrade1btn.image, upgrade1btn.rect)
-
+screen.blit(statsbtn.image, statsbtn.rect)
 last_update_time = pygame.time.get_ticks()
 
 run = True
 while run:
-    clock.tick(60)  # frame rate
+    clock.tick(60)# frame rate
+    time1 = pygame.time.get_ticks() / 1000
+
+
 
 
     events = pygame.event.get()
@@ -174,9 +204,9 @@ while run:
 
     for event in events:
         if event.type == pygame.QUIT:
-
-            cur.execute("INSERT INTO scores (points, perclick, cps, upgrade1, upgrade2) VALUES (?, ?, ?, ?, ?)",
-                        (points, increase_on_click, clicks_per_second, isupgrade1, isupgrade2))
+            totaltime = time1 + totaltime
+            cur.execute("INSERT INTO scores (points, perclick, cps, totalclicks,totaltime, upgrade1, upgrade2) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                        (points, increase_on_click, clicks_per_second, totalclicks, totaltime, isupgrade1, isupgrade2))
             con.commit()
             run = False
 
@@ -185,6 +215,7 @@ while run:
     cps = font2.render(f"cps: {str(clicks_per_second)}", True, (255, 255, 255))
     screen.blit(cps, (10, 120))
     screen.blit(per_click, (10, 145))
+    screen.blit(statsbtn.image, statsbtn.rect)
 
 
     clickbtn.clickbtn(events)
@@ -192,6 +223,7 @@ while run:
     upgrade2btn.upgrade2(events)
     auto1.per_second1(events)
     auto2.per_second2(events)
+    statsbtn.statistics(events)
 
 
     if isupgrade1:
