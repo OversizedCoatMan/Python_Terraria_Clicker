@@ -114,14 +114,16 @@ class BUTTON:
         screen.blit(self.image, (self.rect.x, self.rect.y))
     def upgrade2(self, events):
         global points, increase_on_click, text_surface, mainimg, click_img, isupgrade2
-        for event in events:
-            if event.type ==pygame.MOUSEBUTTONDOWN and event.button ==1 and points >= 500 and isupgrade2 == False:
-                isupgrade2 =True
-                points = float(points) - 500
-                increase_on_click = float(increase_on_click) + 2
-                screen.fill(pygame.Color("black"), (10, 10, 100, 25))
-                text_surface = font2.render(str(points), True, (255, 255, 255))
-                screen.blit(text_surface, (10, 10))
+        pos = pygame.mouse.get_pos()
+        if self.rect.collidepoint(pos):
+            for event in events:
+                if event.type ==pygame.MOUSEBUTTONDOWN and event.button ==1 and points >= 500 and isupgrade2 == False:
+                    isupgrade2 =True
+                    points = float(points) - 500
+                    increase_on_click = float(increase_on_click) + 2
+                    screen.fill(pygame.Color("black"), (10, 10, 100, 25))
+                    text_surface = font2.render(str(points), True, (255, 255, 255))
+                    screen.blit(text_surface, (10, 10))
 
         screen.blit(self.image, (self.rect.x, self.rect.y))
     #code for the cps upgrade1
@@ -166,15 +168,17 @@ run = True
 while run:
     clock.tick(60)  # frame rate
 
-    # 1️⃣ Get all events once per frame
+
     events = pygame.event.get()
 
-    # 2️⃣ Handle quitting the game
+
     for event in events:
         if event.type == pygame.QUIT:
-            run = False
 
-          # Save to database here if needed
+            cur.execute("INSERT INTO scores (points, perclick, cps, upgrade1, upgrade2) VALUES (?, ?, ?, ?, ?)",
+                        (points, increase_on_click, clicks_per_second, isupgrade1, isupgrade2))
+            con.commit()
+            run = False
 
     screen.fill(pygame.Color("black"), (10, 120, 150, 80))
     per_click = font2.render(f"Per Click: {increase_on_click}", True, (255, 255, 255))
