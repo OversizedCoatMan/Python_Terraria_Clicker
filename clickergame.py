@@ -6,7 +6,7 @@ screen_width = 500
 screen_height = 500
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((screen_width, screen_height))
-pygame.display.set_caption("clicker")
+pygame.display.set_caption("Clicker")
 
 # database create file and table
 con = sqlite3.connect("stats.db")
@@ -186,14 +186,14 @@ class BUTTON:
                     totalclicks = int(totalclicks)
                     stats_window = tk.Tk()
                     stats_window.geometry("500x500")
-                    stats_window.title("statistics")
+                    stats_window.title("Statistics")
                     stats_window.configure(background="Black")
-                    label = tk.Label(stats_window, text="statistics", font=("Arial", 24))
+                    label = tk.Label(stats_window, text="Statistics", font=("Arial", 24))
                     label.pack(padx=10, pady=10)
                     totalclk = tk.Label(stats_window, text = f"Total Clicks: {totalclicks}", font = ("Arial", 20))
                     totalclk.pack(padx=10, pady=10)
                     totaltime = int(totaltime)
-                    totaltimel = tk.Label(stats_window, text = f"Total Time: {totaltime}", font = ("Arial", 20))
+                    totaltimel = tk.Label(stats_window, text = f"Total Time: {totaltime} Seconds", font = ("Arial", 20))
                     totaltimel.pack(padx=10, pady=10)
                     stats_window.mainloop()
 
@@ -216,17 +216,12 @@ run = True
 while run:
     clock.tick(60)# frame rate
     time1 = pygame.time.get_ticks() / 1000
-
-
-
-
     events = pygame.event.get()
-
-
     for event in events:
         if event.type == pygame.QUIT:
             totaltime = time1 + totaltime
-            cur.execute("INSERT INTO scores (points, perclick, cps, totalclicks,totaltime, upgrade1, upgrade2, bonus1) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            cur.execute("INSERT INTO scores (points, perclick, cps, totalclicks,totaltime, upgrade1, upgrade2, bonus1) "
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                         (points, increase_on_click, clicks_per_second, totalclicks, totaltime, isupgrade1, isupgrade2, isbonus1))
             con.commit()
             run = False
