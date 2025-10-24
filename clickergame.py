@@ -23,7 +23,7 @@ if row:
     isupgrade1 = bool(isupgrade1)
     isupgrade2 = bool(isupgrade2)
 else:
-    points = 0
+    points = 500
     increase_on_click = 1
     clicks_per_second = 0
     isupgrade1 = False
@@ -102,7 +102,7 @@ class BUTTON:
         global points, increase_on_click, text_surface, mainimg, click_img, isupgrade1
         pos = pygame.mouse.get_pos()
         if self.rect.collidepoint(pos):
-            for event in pygame.event.get():
+            for event in events:
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button ==1 and points >=150 and isupgrade1 == 0:
                     isupgrade1 = True
                     points = float(points) - 150
@@ -114,7 +114,7 @@ class BUTTON:
         screen.blit(self.image, (self.rect.x, self.rect.y))
     def upgrade2(self, events):
         global points, increase_on_click, text_surface, mainimg, click_img, isupgrade2
-        for event in pygame.event.get():
+        for event in events:
             if event.type ==pygame.MOUSEBUTTONDOWN and event.button ==1 and points >= 500 and isupgrade2 == False:
                 isupgrade2 =True
                 points = float(points) - 500
@@ -143,7 +143,7 @@ class BUTTON:
         global points, clicks_per_second, text_surface
         pos = pygame.mouse.get_pos()
         if self.rect.collidepoint(pos):
-            for event in pygame.event.get():
+            for event in events:
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button ==1 and points >=175:
                     points = float(points) - 175
                     clicks_per_second = float(clicks_per_second) + 1
