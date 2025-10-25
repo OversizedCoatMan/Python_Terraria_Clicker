@@ -2,7 +2,7 @@ import pygame
 import sqlite3
 import tkinter as tk
 #pygame display settings
-screen_width = 500
+screen_width = 505
 screen_height = 500
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((screen_width, screen_height))
@@ -49,6 +49,14 @@ else:
     bonus1_price = 1000
     resets = 0
     reset_price = 100000
+
+upgrade1_price = int(upgrade1_price)
+upgrade2_price = int(upgrade2_price)
+upgrade3_price = int(upgrade3_price)
+auto1_price = int(auto1_price)
+auto2_price = int(auto2_price)
+auto3_price = int(auto3_price)
+bonus1_price = int(bonus1_price)
 
 
 #button images
@@ -100,11 +108,10 @@ screen.blit(per_click, (10, 145))
 screen.blit(cps, (10, 120))
 screen.blit(auto, (290, 10))
 screen.blit(upgrades, (425, 10))
-screen.blit(click_img, (0, 0))
 screen.blit(clkl, (10, 100))
 screen.blit(text_surface, (10, 10))
-screen.blit(bonuses, (220, 10))
-screen.blit(bonus1price, (220,107))
+screen.blit(bonuses, (210, 10))
+screen.blit(bonus1price, (210,107))
 
 #button class
 class BUTTON:
@@ -327,7 +334,7 @@ auto2 = BUTTON(333, 140, click_per_sec2, scale=1.6, held=True)
 auto3 = BUTTON(333, 235, click_per_sec3, scale=1.6, held=True)
 statsbtn = BUTTON(10,420, statimg, scale=1, held=True)
 reset = BUTTON(397, 397, reset, scale=1.6, held=True)
-bonus1 = BUTTON(220,45, shackle, scale=2.6, held=True)
+bonus1 = BUTTON(210,45, shackle, scale=2.6, held=True)
 
 screen.blit(upgrade1btn.image, upgrade1btn.rect)
 screen.blit(statsbtn.image, statsbtn.rect)
@@ -375,7 +382,7 @@ while run:
     if isupgrade3:
         screen.blit(no, (434, 235))
     if isbonus1:
-        screen.blit(no, (220, 45))
+        screen.blit(no, (210, 45))
 
 
     current_time = pygame.time.get_ticks()
