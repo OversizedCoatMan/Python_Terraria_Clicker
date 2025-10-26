@@ -11,25 +11,27 @@ pygame.display.set_caption("Clicker")
 # database create file and table
 con = sqlite3.connect("stats.db")
 cur = con.cursor()
-cur.execute("CREATE TABLE IF NOT EXISTS scores(points REAL, perclick REAL, cps REAL, totalclicks REAL, totaltime REAL, upgrade1 REAL, upgrade2 REAL,upgrade3 REAL, bonus1 REAL, upgrade1_price REAL, upgrade2_price REAL, upgrade3_price, auto1_price REAL, auto2_price REAL, auto3_price REAL, bonus1_price REAL, resets REAL, reset_price REAL)")
+cur.execute("CREATE TABLE IF NOT EXISTS scores(points REAL, perclick REAL, cps REAL, totalclicks REAL, totaltime REAL, upgrade1 REAL, upgrade2 REAL,upgrade3 REAL, bonus1 REAL, bonus2 REAL, upgrade1_price REAL, upgrade2_price REAL, upgrade3_price, auto1_price REAL, auto2_price REAL, auto3_price REAL, bonus1_price REAL, bonus2_price, resets REAL, reset_price REAL)")
 
 # reads the data from database
-cur.execute("SELECT points, perclick, cps, totalclicks, totaltime, upgrade1, upgrade2, upgrade3, bonus1, upgrade1_price, upgrade2_price, upgrade3_price, auto1_price, auto2_price, auto3_price, bonus1_price, resets, reset_price FROM scores ORDER BY rowid DESC LIMIT 1")
+cur.execute("SELECT points, perclick, cps, totalclicks, totaltime, upgrade1, upgrade2, upgrade3, bonus1, bonus2, upgrade1_price, upgrade2_price, upgrade3_price, auto1_price, auto2_price, auto3_price, bonus1_price, bonus2_price, resets, reset_price FROM scores ORDER BY rowid DESC LIMIT 1")
 row = cur.fetchone()
 
 #set the variables to the read data, if there is no data than set to default values
 if row:
-    points, increase_on_click, clicks_per_second, totalclicks, totaltime, isupgrade1, isupgrade2, isupgrade3, isbonus1, upgrade1_price, upgrade2_price, upgrade3_price, auto1_price, auto2_price, auto3_price, bonus1_price, resets, reset_price= row
+    points, increase_on_click, clicks_per_second, totalclicks, totaltime, isupgrade1, isupgrade2, isupgrade3, isbonus1, isbonus2, upgrade1_price, upgrade2_price, upgrade3_price, auto1_price, auto2_price, auto3_price, bonus1_price, bonus2_price, resets, reset_price= row
     isupgrade1 = bool(isupgrade1)
     isupgrade2 = bool(isupgrade2)
     isupgrade3 = bool(isupgrade3)
     isbonus1 = bool(isbonus1)
+    isbonus2 = bool(isbonus2)
     upgrade1_price = int(upgrade1_price)
     upgrade2_price = int(upgrade2_price)
     auto1_price = int(auto1_price)
     auto2_price = int(auto2_price)
     auto3_price = int(auto3_price)
     bonus1_price = int(bonus1_price)
+    bonus2_price = int(bonus2_price)
 else:
     points = 100000
     increase_on_click = 1
@@ -40,6 +42,7 @@ else:
     isupgrade2 = False
     isupgrade3 = False
     isbonus1 = False
+    isbonus2=False
     upgrade1_price = 150
     upgrade2_price = 500
     upgrade3_price = 2000
@@ -47,6 +50,7 @@ else:
     auto2_price = 175
     auto3_price = 350
     bonus1_price = 1000
+    bonus2_price = 2000
     resets = 0
     reset_price = 100000
 
@@ -57,7 +61,7 @@ auto1_price = int(auto1_price)
 auto2_price = int(auto2_price)
 auto3_price = int(auto3_price)
 bonus1_price = int(bonus1_price)
-
+bonus2_price = int(bonus2_price)
 
 #button images
 mainimg = "pixil-frame-0.png"
@@ -72,6 +76,7 @@ no = pygame.image.load("Red X.png").convert_alpha()
 statimg = pygame.image.load("statsbtn.png").convert_alpha()
 reset = pygame.image.load("reset.png").convert_alpha()
 shackle = pygame.image.load("Shackle.png").convert_alpha()
+feral = pygame.image.load("Feral_Claws.png").convert_alpha()
 
 
 #fonts
@@ -92,7 +97,8 @@ upgrade3_cost = font2.render(f"{upgrade3_price}|+1", True, (255, 255, 255))
 auto1l = font2.render(f"{auto1_price}|+0.25", True, (255, 255, 255))
 auto2l = font2.render(f"{auto2_price}|+1", True, (255, 255, 255))
 auto3l = font2.render(f"{auto3_price}|+2.5", True, (255, 255, 255))
-bonus1price = font2.render(f"{bonus1_price}|+10%", True, (255, 255, 255))
+bonus1price = font2.render(f"{bonus1_price}|+10% CPS", True, (255, 255, 255))
+bonus2price = font2.render(f"{bonus2_price/1000}k| +25% P/C", True, (255, 255, 255))
 cps = font2.render(f"cps: {str(clicks_per_second)}", True, (255, 255, 255))
 per_click = font2.render(f"Per Click: {increase_on_click}", True, (255, 255, 255))
 
@@ -111,8 +117,9 @@ screen.blit(auto, (270, 10))
 screen.blit(upgrades, (415, 10))
 screen.blit(clkl, (10, 100))
 screen.blit(text_surface, (10, 10))
-screen.blit(bonuses, (190, 10))
-screen.blit(bonus1price, (190,107))
+screen.blit(bonuses, (160, 10))
+screen.blit(bonus1price, (160,107))
+screen.blit(bonus2price, (160,207))
 
 
 
@@ -128,22 +135,23 @@ class BUTTON:
 
     #code for the main button
     def clickbtn(self, events):
-        pos = pygame.mouse.get_pos()
+
         for event in events:
+            global points, increase_on_click, text_surface, totalclicks, pos
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if self.rect.collidepoint(pos):
-                    global points, increase_on_click, text_surface, totalclicks
                     points += increase_on_click
                     totalclicks = int(totalclicks) + 1
                     screen.fill(pygame.Color("black"), (10, 10, 100, 25))
+                    points = round(points, 1)
                     text_surface = font2.render(str(points), True, (255, 255, 255))
                     screen.blit(text_surface, (10, 10))
         screen.blit(self.image, (self.rect.x, self.rect.y))
 
     #code for the per click1 upgrade
     def upgrade1(self, events):
-        global points, increase_on_click, text_surface, mainimg, click_img, isupgrade1, upgrade1_price
-        pos = pygame.mouse.get_pos()
+        global points, increase_on_click, text_surface, mainimg, click_img, isupgrade1, upgrade1_price, pos
+
         if self.rect.collidepoint(pos):
             for event in events:
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button ==1 and points >= upgrade1_price and isupgrade1 == 0:
@@ -151,14 +159,15 @@ class BUTTON:
                     points = float(points) - upgrade1_price
                     increase_on_click = float(increase_on_click) + 1
                     screen.fill(pygame.Color("black"), (10, 10, 100, 25))
+                    points = round(points, 1)
                     text_surface = font2.render(str(points), True, (255, 255, 255))
                     screen.blit(text_surface, (10, 10))
 
 
         screen.blit(self.image, (self.rect.x, self.rect.y))
     def upgrade2(self, events):
-        global points, increase_on_click, text_surface, mainimg, click_img, isupgrade2, upgrade2_price
-        pos = pygame.mouse.get_pos()
+        global points, increase_on_click, text_surface, mainimg, click_img, isupgrade2, upgrade2_price, pos
+
         if self.rect.collidepoint(pos):
             for event in events:
                 if event.type ==pygame.MOUSEBUTTONDOWN and event.button ==1 and points >= upgrade2_price and isupgrade2 == False:
@@ -166,13 +175,14 @@ class BUTTON:
                     points = float(points) - upgrade2_price
                     increase_on_click = float(increase_on_click) + 1
                     screen.fill(pygame.Color("black"), (10, 10, 100, 25))
+                    points = round(points, 1)
                     text_surface = font2.render(str(points), True, (255, 255, 255))
                     screen.blit(text_surface, (10, 10))
 
         screen.blit(self.image, (self.rect.x, self.rect.y))
     def upgrade3(self, events):
-        global points, increase_on_click, text_surface, mainimg, click_img, isupgrade3, upgrade3_price
-        pos = pygame.mouse.get_pos()
+        global points, increase_on_click, text_surface, mainimg, click_img, isupgrade3, upgrade3_price, pos
+
         if self.rect.collidepoint(pos):
             for event in events:
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and points >= upgrade3_price:
@@ -180,46 +190,50 @@ class BUTTON:
                     points = float(points) - upgrade3_price
                     increase_on_click = float(increase_on_click) + 1
                     screen.fill(pygame.Color("black"), (10, 10, 100, 25))
+                    points = round(points, 1)
                     text_surface = font2.render(str(points), True, (255, 255, 255))
                     screen.blit(text_surface, (10, 10))
         screen.blit(self.image, (self.rect.x, self.rect.y))
     #code for the cps upgrade1
     def per_second1(self, events):
-        global points, clicks_per_second, text_surface, auto1_price
-        pos = pygame.mouse.get_pos()
+        global points, clicks_per_second, text_surface, auto1_price, pos
+
         if self.rect.collidepoint(pos):
             for event in events:
-                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and points >= 50:
+                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and points >= auto1_price:
                     points = float(points) - auto1_price
                     clicks_per_second = float(clicks_per_second) + 0.25
                     screen.fill(pygame.Color("black"), (10, 10, 100, 25))
+                    points = round(points, 1)
                     text_surface = font2.render(str(points), True, (255, 255, 255))
                     screen.blit(text_surface, (10, 10))
 
         screen.blit(self.image, (self.rect.x, self.rect.y))
 
     def per_second2(self, events):
-        global points, clicks_per_second, text_surface, auto2_price
-        pos = pygame.mouse.get_pos()
+        global points, clicks_per_second, text_surface, auto2_price, pos
+
         if self.rect.collidepoint(pos):
             for event in events:
-                if event.type == pygame.MOUSEBUTTONDOWN and event.button ==1 and points >=175:
+                if event.type == pygame.MOUSEBUTTONDOWN and event.button ==1 and points >= auto2_price:
                     points = float(points) - auto2_price
                     clicks_per_second = float(clicks_per_second) + 1
                     screen.fill(pygame.Color("black"), (10, 10, 100, 25))
+                    points = round(points, 1)
                     text_surface = font2.render(str(points), True, (255, 255, 255))
                     screen.blit(text_surface, (10, 10))
         screen.blit(self.image, (self.rect.x, self.rect.y))
 
     def per_second3(self, events):
-        global points, clicks_per_second, text_surface, auto3_price
-        pos = pygame.mouse.get_pos()
+        global points, clicks_per_second, text_surface, auto3_price, pos
+
         if self.rect.collidepoint(pos):
             for event in events:
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and points >= auto3_price:
                     points = float(points) - auto3_price
                     clicks_per_second = float(clicks_per_second) + 2.5
                     screen.fill(pygame.Color("black"), (10, 10, 100, 25))
+                    points = round(points, 1)
                     text_surface = font2.render(str(points), True, (255, 255, 255))
                     screen.blit(text_surface, (10, 10))
         screen.blit(self.image, (self.rect.x, self.rect.y))
@@ -228,24 +242,37 @@ class BUTTON:
 
 
 
-    def bonus(self, events):
-        global points, clicks_per_second, isbonus1, bonus1_price
-        pos = pygame.mouse.get_pos()
+    def bonus1(self, events):
+        global points, clicks_per_second, isbonus1, bonus1_price, pos
+
         if self.rect.collidepoint(pos):
             for event in events:
-                if event.type == pygame.MOUSEBUTTONDOWN and event.button ==1 and points >= 1000 and isbonus1 == False:
+                if event.type == pygame.MOUSEBUTTONDOWN and event.button ==1 and points >= bonus1_price and isbonus1 == False:
                     points -= bonus1_price
                     isbonus1 = True
-                    clicks_per_second = clicks_per_second * 1.10
+                    clicks_per_second = clicks_per_second + 10/100
                     screen.fill(pygame.Color("black"), (10, 10, 100, 25))
+                    points = round(points, 1)
+                    text_surface = font2.render(str(points), True, (255, 255, 255))
+                    screen.blit(text_surface, (10, 10))
+        screen.blit(self.image, (self.rect.x, self.rect.y))
+    def bonus2(self, events):
+        global points, increase_on_click, isbonus2, bonus2_price, pos
+        if self.rect.collidepoint(pos):
+            for event in events:
+                if event.type ==pygame.MOUSEBUTTONDOWN and event.button == 1 and points >= bonus2_price and isbonus2 == False:
+                    isbonus2 = True
+                    points = float(points) - bonus2_price
+                    increase_on_click = increase_on_click + (increase_on_click * 25/100)
+                    screen.fill(pygame.Color("black"), (10, 10, 100, 25))
+                    points = round(points, 1)
                     text_surface = font2.render(str(points), True, (255, 255, 255))
                     screen.blit(text_surface, (10, 10))
         screen.blit(self.image, (self.rect.x, self.rect.y))
 
-
     def statistics(self, events):
-        global totalclicks, totaltime, time1
-        pos = pygame.mouse.get_pos()
+        global totalclicks, totaltime, time1, pos
+
         if self.rect.collidepoint(pos):
             for event in events:
                 if event.type ==pygame.MOUSEBUTTONDOWN and event.button ==1:
@@ -265,8 +292,8 @@ class BUTTON:
 
 
     def reset(self, events):
-        global run, reset_price, points, close
-        pos = pygame.mouse.get_pos()
+        global pos, run, reset_price, points, close
+
         if self.rect.collidepoint(pos):
             for event in events:
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
@@ -289,7 +316,7 @@ class BUTTON:
                         not_enough = tk.Label(text="Not Enough Points")
                         not_enough.pack(padx=10, pady=20)
                     def doreset():
-                        global close, points, increase_on_click, clicks_per_second, isbonus1, isupgrade1, isupgrade2, isupgrade3, upgrade1_price, upgrade2_price, upgrade3_price, auto1_price, auto2_price, auto3_price, bonus1_price, resets, reset_price, reset_window, run, totaltime, time1
+                        global close, points, increase_on_click, clicks_per_second, isbonus1, isbonus2, isupgrade1, isupgrade2, isupgrade3, upgrade1_price, upgrade2_price, upgrade3_price, auto1_price, auto2_price, auto3_price, bonus1_price, bonus2_price, resets, reset_price, reset_window, run, totaltime, time1
                         if points >= reset_price:
                             totaltime = time1 + totaltime
                             points = 0
@@ -299,6 +326,7 @@ class BUTTON:
                             isupgrade2 = False
                             isupgrade3 = False
                             isbonus1 = False
+                            isbonus2 = False
                             upgrade1_price -= (upgrade1_price * 10/100)
                             upgrade2_price -= (upgrade2_price * 10/100)
                             upgrade3_price -= (upgrade3_price * 10/100)
@@ -306,9 +334,10 @@ class BUTTON:
                             auto2_price -= (auto2_price * 10/100)
                             auto3_price -= (auto3_price * 10/100)
                             bonus1_price -= (bonus1_price * 10/100)
+                            bonus2_price -= (bonus2_price * 10/100)
                             resets += 1
                             reset_price += (reset_price * 50/100)
-                            screen.fill(pygame.Color("black"), (210, 107, 500, 500))
+                            screen.fill(pygame.Color("black"), (160, 45, 500, 500))
                             upgrade1_cost = font2.render(f"{upgrade1_price}|+1", True, (255, 255, 255))
                             upgrade2_cost = font2.render(f"{upgrade2_price}|+1", True, (255, 255, 255))
                             upgrade3_cost = font2.render(f"{upgrade3_price}|+1", True, (255, 255, 255))
@@ -316,6 +345,7 @@ class BUTTON:
                             auto2l = font2.render(f"{auto2_price}|+1", True, (255, 255, 255))
                             auto3l = font2.render(f"{auto3_price}|+2.5", True, (255, 255, 255))
                             bonus1price = font2.render(f"{bonus1_price}|+10%", True, (255, 255, 255))
+                            bonus2price = font2.render(f"{bonus2_price/1000}k| +25% P/C", True, (255, 255, 255))
                             screen.blit(upgrade1_cost, (424, 107))
                             screen.blit(upgrade2_cost, (424, 207))
                             screen.blit(upgrade3_cost, (420, 307))
@@ -323,12 +353,13 @@ class BUTTON:
                             screen.blit(auto2l, (313, 207))
                             screen.blit(auto3l, (313, 307))
                             screen.blit(bonus1price, (190, 107))
+                            screen.blit(bonus2price, (160, 207))
                             cur.execute(
-                                "INSERT INTO scores (points, perclick, cps, totalclicks, totaltime, upgrade1, upgrade2, upgrade3, bonus1, upgrade1_price, upgrade2_price, upgrade3_price, auto1_price, auto2_price, auto3_price, bonus1_price, resets, reset_price) "
-                                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                                "INSERT INTO scores (points, perclick, cps, totalclicks, totaltime, upgrade1, upgrade2, upgrade3, bonus1, bonus2, upgrade1_price, upgrade2_price, upgrade3_price, auto1_price, auto2_price, auto3_price, bonus1_price, bonus2_price, resets, reset_price) "
+                                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                                 (points, increase_on_click, clicks_per_second, totalclicks, totaltime, isupgrade1,
-                                 isupgrade2, isupgrade3, isbonus1, upgrade1_price, upgrade2_price, upgrade3_price,
-                                 auto1_price, auto2_price, auto3_price, bonus1_price, resets, reset_price))
+                                 isupgrade2, isupgrade3, isbonus1, isbonus2, upgrade1_price, upgrade2_price, upgrade3_price,
+                                 auto1_price, auto2_price, auto3_price, bonus1_price, bonus2_price, resets, reset_price))
                             con.commit()
                             close=True
 
@@ -354,6 +385,7 @@ auto3 = BUTTON(313, 235, click_per_sec3, scale=1.6, held=True)
 statsbtn = BUTTON(10,420, statimg, scale=1, held=True)
 reset = BUTTON(397, 397, reset, scale=1.6, held=True)
 bonus1 = BUTTON(190,45, shackle, scale=2.6, held=True)
+bonus2 = BUTTON(190, 140, feral, scale=2.6, held=True)
 
 screen.blit(upgrade1btn.image, upgrade1btn.rect)
 screen.blit(statsbtn.image, statsbtn.rect)
@@ -362,18 +394,23 @@ last_update_time = pygame.time.get_ticks()
 run = True
 while run:
     clock.tick(60)# frame rate
+    pos = pygame.mouse.get_pos()
     time1 = pygame.time.get_ticks() / 1000
     events = pygame.event.get()
     for event in events:
         if event.type == pygame.QUIT or run==False:
             totaltime = time1 + totaltime
-            cur.execute("INSERT INTO scores (points, perclick, cps, totalclicks, totaltime, upgrade1, upgrade2, upgrade3, bonus1, upgrade1_price, upgrade2_price, upgrade3_price, auto1_price, auto2_price, auto3_price, bonus1_price, resets, reset_price) "
-                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                        (points, increase_on_click, clicks_per_second, totalclicks, totaltime, isupgrade1, isupgrade2, isupgrade3, isbonus1, upgrade1_price, upgrade2_price, upgrade3_price, auto1_price, auto2_price, auto3_price, bonus1_price, resets, reset_price))
+            cur.execute(
+                "INSERT INTO scores (points, perclick, cps, totalclicks, totaltime, upgrade1, upgrade2, upgrade3, bonus1, bonus2, upgrade1_price, upgrade2_price, upgrade3_price, auto1_price, auto2_price, auto3_price, bonus1_price, bonus2_price, resets, reset_price) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                (points, increase_on_click, clicks_per_second, totalclicks, totaltime, isupgrade1,
+                 isupgrade2, isupgrade3, isbonus1, isbonus2, upgrade1_price, upgrade2_price, upgrade3_price,
+                 auto1_price, auto2_price, auto3_price, bonus1_price, bonus2_price, resets, reset_price))
             con.commit()
             run = False
 
     screen.fill(pygame.Color("black"), (10, 120, 150, 80))
+    points = round(points, 1)
     per_click = font2.render(f"Per Click: {increase_on_click}", True, (255, 255, 255))
     clicks_per_second = round(clicks_per_second, 2)
     cps = font2.render(f"cps: {str(clicks_per_second)}", True, (255, 255, 255))
@@ -389,20 +426,22 @@ while run:
     auto1.per_second1(events)
     auto2.per_second2(events)
     auto3.per_second3(events)
-    bonus1.bonus(events)
+    bonus1.bonus1(events)
+    bonus2.bonus2(events)
     statsbtn.statistics(events)
     reset.reset(events)
 
 
     if isupgrade1:
-        screen.blit(no, (434, 45))
+        screen.blit(no, (424, 45))
     if isupgrade2:
-        screen.blit(no, (434, 140))
+        screen.blit(no, (424, 140))
     if isupgrade3:
-        screen.blit(no, (434, 235))
+        screen.blit(no, (424, 235))
     if isbonus1:
-        screen.blit(no, (210, 45))
-
+        screen.blit(no, (190, 45))
+    if isbonus2:
+        screen.blit(no, (190, 140))
 
     current_time = pygame.time.get_ticks()
     if current_time - last_update_time >= 1000:
