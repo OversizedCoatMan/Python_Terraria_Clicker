@@ -33,7 +33,7 @@ if row:
     bonus1_price = int(bonus1_price)
     bonus2_price = int(bonus2_price)
 else:
-    points = 100000
+    points = 0
     increase_on_click = 1
     clicks_per_second = 0
     totalclicks = 0
