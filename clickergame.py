@@ -2,8 +2,8 @@ import pygame
 import sqlite3
 import tkinter as tk
 #pygame display settings
-screen_width = 515
-screen_height = 500
+screen_width = 715
+screen_height = 700
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("Clicker")
@@ -84,10 +84,17 @@ pygame.font.init()
 font = pygame.font.SysFont("Arial", 20)
 font2 = pygame.font.SysFont("Arial", 25)
 
-
+upgrade1_price = int(upgrade1_price)
+upgrade2_price = int(upgrade2_price)
+upgrade3_price = int(upgrade3_price)
+auto1_price = int(auto1_price)
+auto2_price = int(auto2_price)
+auto3_price = int(auto3_price)
+bonus1_price = int(bonus1_price)
+bonus2_price = int(bonus2_price)
+resets = int(resets)
 #all text surfaces
 text_surface = font2.render(str(points), True, (255, 255, 255))
-clkl = font.render("Click For Coins", True, (255, 255, 255))
 upgrades = font.render("Upgrades", True, (255, 255, 255))
 auto = font.render("CPS Upgrades", True, (255, 255, 255))
 bonuses = font.render("Bonuses", True, (255, 255, 255))
@@ -99,27 +106,24 @@ auto2l = font2.render(f"{auto2_price}|+1", True, (255, 255, 255))
 auto3l = font2.render(f"{auto3_price}|+2.5", True, (255, 255, 255))
 bonus1price = font2.render(f"{bonus1_price}|+10% CPS", True, (255, 255, 255))
 bonus2price = font2.render(f"{bonus2_price/1000}k| +25% P/C", True, (255, 255, 255))
-cps = font2.render(f"cps: {str(clicks_per_second)}", True, (255, 255, 255))
-per_click = font2.render(f"Per Click: {increase_on_click}", True, (255, 255, 255))
+total_resets = font2.render(f"Resets: {resets}", True, (255, 255, 255))
 
 
 
 #renders the text surfaces on screen
-screen.blit(upgrade3_cost, (420, 307))
-screen.blit(auto3l, (313, 307))
-screen.blit(upgrade2_cost, (424, 207))
-screen.blit(auto2l, (313, 207))
-screen.blit(auto1l, (313, 107))
-screen.blit(upgrade1_cost, (424, 107))
-screen.blit(per_click, (10, 145))
-screen.blit(cps, (10, 120))
-screen.blit(auto, (270, 10))
-screen.blit(upgrades, (415, 10))
-screen.blit(clkl, (10, 100))
 screen.blit(text_surface, (10, 10))
-screen.blit(bonuses, (160, 10))
-screen.blit(bonus1price, (160,107))
-screen.blit(bonus2price, (160,207))
+screen.blit(total_resets, (600,10))
+screen.blit(upgrades, (615, 45))
+screen.blit(upgrade1_cost, (624, 142))
+screen.blit(upgrade2_cost, (624, 242))
+screen.blit(upgrade3_cost, (620, 342))
+screen.blit(auto, (413, 45))
+screen.blit(auto1l, (413, 142))
+screen.blit(auto2l, (413, 242))
+screen.blit(auto3l, (413, 342))
+screen.blit(bonuses, (160, 45))
+screen.blit(bonus1price, (160,142))
+screen.blit(bonus2price, (160,242))
 
 
 
@@ -306,14 +310,14 @@ class BUTTON:
                     reset_label.pack(padx=10, pady=5)
                     info_label1 = tk.Label(text="This Will Reset Everything!", font=("Arial", 20))
                     info_label1.pack(padx=10, pady=20)
-                    info_label2 = tk.Label(reset_window, text="Upgrades Will Now Give You", font=("Arial", 20))
+                    info_label2 = tk.Label(reset_window, text="You Will Now Have A", font=("Arial", 20))
                     info_label2.pack(padx=10)
                     info_label3 = tk.Label(text="10% Discount On All Upgrades", font=("Arial", 20))
                     info_label3.pack(padx=10)
                     cost_label = tk.Label(reset_window, text=f"Cost: {reset_price}", font=("Arial", 20))
                     cost_label.pack(padx=10, pady=10)
                     if points < reset_price:
-                        not_enough = tk.Label(text="Not Enough Points")
+                        not_enough = tk.Label(text="Not Enough Points", font = ("Arial", 16))
                         not_enough.pack(padx=10, pady=20)
                     def doreset():
                         global close, points, increase_on_click, clicks_per_second, isbonus1, isbonus2, isupgrade1, isupgrade2, isupgrade3, upgrade1_price, upgrade2_price, upgrade3_price, auto1_price, auto2_price, auto3_price, bonus1_price, bonus2_price, resets, reset_price, reset_window, run, totaltime, time1
@@ -337,7 +341,19 @@ class BUTTON:
                             bonus2_price -= (bonus2_price * 10/100)
                             resets += 1
                             reset_price += (reset_price * 50/100)
-                            screen.fill(pygame.Color("black"), (160, 45, 500, 500))
+                            screen.fill(pygame.Color("black"), (160, 45, 700, 700))
+
+                            upgrade1_price = int(upgrade1_price)
+                            upgrade2_price = int(upgrade2_price)
+                            upgrade3_price = int(upgrade3_price)
+                            auto1_price = int(auto1_price)
+                            auto2_price = int(auto2_price)
+                            auto3_price = int(auto3_price)
+                            bonus1_price = int(bonus1_price)
+                            bonus2_price = int(bonus2_price)
+                            resets = int(resets)
+                            total_resets = font2.render(f"Resets: {resets}", True, (255, 255, 255))
+                            screen.blit(total_resets, (600,10))
                             upgrade1_cost = font2.render(f"{upgrade1_price}|+1", True, (255, 255, 255))
                             upgrade2_cost = font2.render(f"{upgrade2_price}|+1", True, (255, 255, 255))
                             upgrade3_cost = font2.render(f"{upgrade3_price}|+1", True, (255, 255, 255))
@@ -346,14 +362,14 @@ class BUTTON:
                             auto3l = font2.render(f"{auto3_price}|+2.5", True, (255, 255, 255))
                             bonus1price = font2.render(f"{bonus1_price}|+10%", True, (255, 255, 255))
                             bonus2price = font2.render(f"{bonus2_price/1000}k| +25% P/C", True, (255, 255, 255))
-                            screen.blit(upgrade1_cost, (424, 107))
-                            screen.blit(upgrade2_cost, (424, 207))
-                            screen.blit(upgrade3_cost, (420, 307))
-                            screen.blit(auto1l, (313, 107))
-                            screen.blit(auto2l, (313, 207))
-                            screen.blit(auto3l, (313, 307))
-                            screen.blit(bonus1price, (190, 107))
-                            screen.blit(bonus2price, (160, 207))
+                            screen.blit(upgrade1_cost, (624, 142))
+                            screen.blit(upgrade2_cost, (624, 242))
+                            screen.blit(upgrade3_cost, (620, 342))
+                            screen.blit(auto1l, (413, 142))
+                            screen.blit(auto2l, (413, 242))
+                            screen.blit(auto3l, (413, 342))
+                            screen.blit(bonus1price, (160, 142))
+                            screen.blit(bonus2price, (160, 242))
                             cur.execute(
                                 "INSERT INTO scores (points, perclick, cps, totalclicks, totaltime, upgrade1, upgrade2, upgrade3, bonus1, bonus2, upgrade1_price, upgrade2_price, upgrade3_price, auto1_price, auto2_price, auto3_price, bonus1_price, bonus2_price, resets, reset_price) "
                                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
@@ -375,17 +391,17 @@ class BUTTON:
 
         screen.blit(self.image, (self.rect.x, self.rect.y))
 #the buttons
-clickbtn = BUTTON(25, 50, click_img, 2.5, True)
-upgrade1btn = BUTTON(424, 45, upgrade1, scale=1.9, held=True)
-upgrade2btn = BUTTON(424, 140, upgrade2, scale=1.85, held=True)
-upgrade3btn = BUTTON(424, 235, upgrade3, scale=1.9, held=True)
-auto1 = BUTTON(313, 45, click_per_sec1, scale=1.6, held=True)
-auto2 = BUTTON(313, 140, click_per_sec2, scale=1.6, held=True)
-auto3 = BUTTON(313, 235, click_per_sec3, scale=1.6, held=True)
-statsbtn = BUTTON(10,420, statimg, scale=1, held=True)
-reset = BUTTON(397, 397, reset, scale=1.6, held=True)
-bonus1 = BUTTON(190,45, shackle, scale=2.6, held=True)
-bonus2 = BUTTON(190, 140, feral, scale=2.6, held=True)
+clickbtn = BUTTON(25, 80, click_img, 4, True)
+upgrade1btn = BUTTON(624, 80, upgrade1, scale=1.9, held=True)
+upgrade2btn = BUTTON(624, 175, upgrade2, scale=1.85, held=True)
+upgrade3btn = BUTTON(624, 270, upgrade3, scale=1.9, held=True)
+auto1 = BUTTON(413, 80, click_per_sec1, scale=1.6, held=True)
+auto2 = BUTTON(413, 175, click_per_sec2, scale=1.6, held=True)
+auto3 = BUTTON(413, 270, click_per_sec3, scale=1.6, held=True)
+statsbtn = BUTTON(10,625, statimg, scale=1.5, held=True)
+reset = BUTTON(597, 610, reset, scale=2, held=True)
+bonus1 = BUTTON(190,80, shackle, scale=2.6, held=True)
+bonus2 = BUTTON(190, 175, feral, scale=2.6, held=True)
 
 screen.blit(upgrade1btn.image, upgrade1btn.rect)
 screen.blit(statsbtn.image, statsbtn.rect)
@@ -409,13 +425,16 @@ while run:
             con.commit()
             run = False
 
-    screen.fill(pygame.Color("black"), (10, 120, 150, 80))
+    screen.fill(pygame.Color("black"), (160, 0, 700, 34))
+    resets = int(resets)
+    total_resets = font2.render(f"Resets: {resets}", True, (255, 255, 255))
+    screen.blit(total_resets, (600, 10))
     points = round(points, 1)
     per_click = font2.render(f"Per Click: {increase_on_click}", True, (255, 255, 255))
     clicks_per_second = round(clicks_per_second, 2)
-    cps = font2.render(f"cps: {str(clicks_per_second)}", True, (255, 255, 255))
-    screen.blit(cps, (10, 120))
-    screen.blit(per_click, (10, 145))
+    cps = font2.render(f"CPS: {str(clicks_per_second)}", True, (255, 255, 255))
+    screen.blit(cps, (160, 10))
+    screen.blit(per_click, (375, 10))
     screen.blit(statsbtn.image, statsbtn.rect)
 
 
@@ -433,15 +452,15 @@ while run:
 
 
     if isupgrade1:
-        screen.blit(no, (424, 45))
+        screen.blit(no, (624, 80))
     if isupgrade2:
-        screen.blit(no, (424, 140))
+        screen.blit(no, (624, 175))
     if isupgrade3:
-        screen.blit(no, (424, 235))
+        screen.blit(no, (624, 270))
     if isbonus1:
-        screen.blit(no, (190, 45))
+        screen.blit(no, (190, 80))
     if isbonus2:
-        screen.blit(no, (190, 140))
+        screen.blit(no, (190, 175))
 
     current_time = pygame.time.get_ticks()
     if current_time - last_update_time >= 1000:
