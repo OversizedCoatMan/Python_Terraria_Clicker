@@ -2,7 +2,7 @@ import pygame
 import sqlite3
 import tkinter as tk
 #pygame display settings
-screen_width = 505
+screen_width = 515
 screen_height = 500
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((screen_width, screen_height))
@@ -97,21 +97,24 @@ cps = font2.render(f"cps: {str(clicks_per_second)}", True, (255, 255, 255))
 per_click = font2.render(f"Per Click: {increase_on_click}", True, (255, 255, 255))
 
 
+
 #renders the text surfaces on screen
-screen.blit(upgrade3_cost, (430, 307))
-screen.blit(auto3l, (333, 307))
-screen.blit(upgrade2_cost, (434, 207))
-screen.blit(auto2l, (333, 207))
-screen.blit(auto1l, (333, 107))
-screen.blit(upgrade1_cost, (434, 107))
+screen.blit(upgrade3_cost, (420, 307))
+screen.blit(auto3l, (313, 307))
+screen.blit(upgrade2_cost, (424, 207))
+screen.blit(auto2l, (313, 207))
+screen.blit(auto1l, (313, 107))
+screen.blit(upgrade1_cost, (424, 107))
 screen.blit(per_click, (10, 145))
 screen.blit(cps, (10, 120))
-screen.blit(auto, (290, 10))
-screen.blit(upgrades, (425, 10))
+screen.blit(auto, (270, 10))
+screen.blit(upgrades, (415, 10))
 screen.blit(clkl, (10, 100))
 screen.blit(text_surface, (10, 10))
-screen.blit(bonuses, (210, 10))
-screen.blit(bonus1price, (210,107))
+screen.blit(bonuses, (190, 10))
+screen.blit(bonus1price, (190,107))
+
+
 
 #button class
 class BUTTON:
@@ -267,6 +270,7 @@ class BUTTON:
         if self.rect.collidepoint(pos):
             for event in events:
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    close=False
                     reset_window = tk.Tk()
                     reset_window.geometry("500x400")
                     reset_window.title("Reset")
@@ -304,6 +308,21 @@ class BUTTON:
                             bonus1_price -= (bonus1_price * 10/100)
                             resets += 1
                             reset_price += (reset_price * 50/100)
+                            screen.fill(pygame.Color("black"), (210, 107, 500, 500))
+                            upgrade1_cost = font2.render(f"{upgrade1_price}|+1", True, (255, 255, 255))
+                            upgrade2_cost = font2.render(f"{upgrade2_price}|+1", True, (255, 255, 255))
+                            upgrade3_cost = font2.render(f"{upgrade3_price}|+1", True, (255, 255, 255))
+                            auto1l = font2.render(f"{auto1_price}|+0.25", True, (255, 255, 255))
+                            auto2l = font2.render(f"{auto2_price}|+1", True, (255, 255, 255))
+                            auto3l = font2.render(f"{auto3_price}|+2.5", True, (255, 255, 255))
+                            bonus1price = font2.render(f"{bonus1_price}|+10%", True, (255, 255, 255))
+                            screen.blit(upgrade1_cost, (424, 107))
+                            screen.blit(upgrade2_cost, (424, 207))
+                            screen.blit(upgrade3_cost, (420, 307))
+                            screen.blit(auto1l, (313, 107))
+                            screen.blit(auto2l, (313, 207))
+                            screen.blit(auto3l, (313, 307))
+                            screen.blit(bonus1price, (190, 107))
                             cur.execute(
                                 "INSERT INTO scores (points, perclick, cps, totalclicks, totaltime, upgrade1, upgrade2, upgrade3, bonus1, upgrade1_price, upgrade2_price, upgrade3_price, auto1_price, auto2_price, auto3_price, bonus1_price, resets, reset_price) "
                                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
@@ -311,7 +330,7 @@ class BUTTON:
                                  isupgrade2, isupgrade3, isbonus1, upgrade1_price, upgrade2_price, upgrade3_price,
                                  auto1_price, auto2_price, auto3_price, bonus1_price, resets, reset_price))
                             con.commit()
-                            run = False
+                            close=True
 
 
                     reset_button = tk.Button(reset_window, text="Reset", font=("Arial", 20), command = doreset)
@@ -326,15 +345,15 @@ class BUTTON:
         screen.blit(self.image, (self.rect.x, self.rect.y))
 #the buttons
 clickbtn = BUTTON(25, 50, click_img, 2.5, True)
-upgrade1btn = BUTTON(434, 45, upgrade1, scale=1.9, held=True)
-upgrade2btn = BUTTON(434, 140, upgrade2, scale=1.85, held=True)
-upgrade3btn = BUTTON(434, 235, upgrade3, scale=1.9, held=True)
-auto1 = BUTTON(333, 45, click_per_sec1, scale=1.6, held=True)
-auto2 = BUTTON(333, 140, click_per_sec2, scale=1.6, held=True)
-auto3 = BUTTON(333, 235, click_per_sec3, scale=1.6, held=True)
+upgrade1btn = BUTTON(424, 45, upgrade1, scale=1.9, held=True)
+upgrade2btn = BUTTON(424, 140, upgrade2, scale=1.85, held=True)
+upgrade3btn = BUTTON(424, 235, upgrade3, scale=1.9, held=True)
+auto1 = BUTTON(313, 45, click_per_sec1, scale=1.6, held=True)
+auto2 = BUTTON(313, 140, click_per_sec2, scale=1.6, held=True)
+auto3 = BUTTON(313, 235, click_per_sec3, scale=1.6, held=True)
 statsbtn = BUTTON(10,420, statimg, scale=1, held=True)
 reset = BUTTON(397, 397, reset, scale=1.6, held=True)
-bonus1 = BUTTON(210,45, shackle, scale=2.6, held=True)
+bonus1 = BUTTON(190,45, shackle, scale=2.6, held=True)
 
 screen.blit(upgrade1btn.image, upgrade1btn.rect)
 screen.blit(statsbtn.image, statsbtn.rect)
