@@ -2,23 +2,23 @@ import pygame
 import sqlite3
 import tkinter as tk
 
-#pygame display settings
+
 screen_width = 715
 screen_height = 700
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("Clicker")
 
-# database create file and table
+
 con = sqlite3.connect("stats.db")
 cur = con.cursor()
 cur.execute("CREATE TABLE IF NOT EXISTS scores(points REAL, perclick REAL, cps REAL, totalclicks REAL, totaltime REAL, upgrade1 REAL, upgrade2 REAL,upgrade3 REAL, bonus1 REAL, bonus2 REAL, bonus3, upgrade1_price REAL, upgrade2_price REAL, upgrade3_price, auto1_price REAL, auto2_price REAL, auto3_price REAL, bonus1_price REAL, bonus2_price REAL, bonus3_price REAL, resets REAL, reset_price REAL, spent REAL, auto1_bought REAL, auto2_bought REAL, auto3_bought REAL)")
 
-# reads the data from database
+
 cur.execute("SELECT points, perclick, cps, totalclicks, totaltime, upgrade1, upgrade2, upgrade3, bonus1, bonus2, bonus3, upgrade1_price, upgrade2_price, upgrade3_price, auto1_price, auto2_price, auto3_price, bonus1_price, bonus2_price, bonus3_price, resets, reset_price, spent , auto1_bought, auto2_bought, auto3_bought FROM scores ORDER BY rowid DESC LIMIT 1")
 row = cur.fetchone()
 
-#set the variables to the read data, if there is no data than set to default values
+
 if row:
     points, increase_on_click, clicks_per_second, totalclicks, totaltime, isupgrade1, isupgrade2, isupgrade3, isbonus1, isbonus2, isbonus3, upgrade1_price, upgrade2_price, upgrade3_price, auto1_price, auto2_price, auto3_price, bonus1_price, bonus2_price, bonus3_price, resets, reset_price, spent, auto1_bought, auto2_bought, auto3_bought = row
     isupgrade1 = bool(isupgrade1)
@@ -69,7 +69,7 @@ else:
 
 
 
-#button images
+
 mainimg = "pixil-frame-0.png"
 click_img = pygame.image.load(mainimg).convert_alpha()
 upgrade1 = pygame.image.load("Wooden_Sword.png").convert_alpha()
@@ -85,7 +85,7 @@ shackle = pygame.image.load("Shackle.png").convert_alpha()
 feral = pygame.image.load("Feral_Claws.png").convert_alpha()
 wrath = pygame.image.load("Wrath_Potion.png").convert_alpha()
 
-#fonts
+
 pygame.font.init()
 font = pygame.font.SysFont("Arial", 20)
 font2 = pygame.font.SysFont("Arial", 25)
@@ -125,7 +125,7 @@ def draw():
     screen.blit(bonus2price, (160, 242))
     screen.blit(bonus3price, (160, 342))
 draw()
-#button class
+
 
 class BUTTON:
     def __init__(self, x, y, image, scale, held):
@@ -136,7 +136,7 @@ class BUTTON:
         self.rect.topleft=(x,y)
 
 
-    #code for the main button
+
     def clickbtn(self, events):
 
         for event in events:
@@ -151,7 +151,7 @@ class BUTTON:
                     screen.blit(text_surface, (10, 10))
         screen.blit(self.image, (self.rect.x, self.rect.y))
 
-    #code for the per click1 upgrade
+
     def upgrade1(self, events):
         global points, spent, increase_on_click, text_surface, mainimg, click_img, isupgrade1, upgrade1_price, pos
 
@@ -200,7 +200,7 @@ class BUTTON:
                     text_surface = font2.render(str(points), True, (255, 255, 255))
                     screen.blit(text_surface, (10, 10))
         screen.blit(self.image, (self.rect.x, self.rect.y))
-    #code for the cps upgrade1
+
     def per_second1(self, events):
         global points, spent, clicks_per_second, text_surface, auto1_price, pos, auto1_bought
 
@@ -413,7 +413,7 @@ class BUTTON:
 
 
         screen.blit(self.image, (self.rect.x, self.rect.y))
-#the buttons
+
 clickbtn = BUTTON(25, 80, click_img, 4, True)
 upgrade1btn = BUTTON(624, 80, upgrade1, scale=1.9, held=True)
 upgrade2btn = BUTTON(624, 175, upgrade2, scale=1.85, held=True)
@@ -433,7 +433,7 @@ last_update_time = pygame.time.get_ticks()
 
 running = True
 while running:
-    clock.tick(60)# frame rate
+    clock.tick(60)
     pos = pygame.mouse.get_pos()
     time1 = pygame.time.get_ticks() / 1000
     events = pygame.event.get()
