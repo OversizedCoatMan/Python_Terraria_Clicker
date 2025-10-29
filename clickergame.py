@@ -40,7 +40,7 @@ if row:
     auto3_bought = int(auto3_bought)
 
 else:
-    points = 100000
+    points = 0
     increase_on_click = 1
     clicks_per_second = 0
     totalclicks = 0
