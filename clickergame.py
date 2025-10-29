@@ -354,12 +354,15 @@ class BUTTON:
                         not_enough = tk.Label(text="Not Enough Points", font = ("Arial", 16))
                         not_enough.pack(padx=10, pady=20)
                     def doreset():
-                        global close, spent, points, increase_on_click, clicks_per_second, isbonus1, isbonus2, isbonus3, isupgrade1, isupgrade2, isupgrade3, upgrade1_price, upgrade2_price, upgrade3_price, auto1_price, auto2_price, auto3_price, bonus1_price, bonus2_price, bonus3_price, resets, reset_price, reset_window, run, totaltime, time1
+                        global close, spent, points, increase_on_click, clicks_per_second, isbonus1, isbonus2, isbonus3, isupgrade1, isupgrade2, isupgrade3, upgrade1_price, upgrade2_price, upgrade3_price, auto1_price, auto2_price, auto3_price, bonus1_price, bonus2_price, bonus3_price, resets, reset_price, reset_window, run, totaltime, time1, auto1_bought, auto2_bought, auto3_bought
                         if points >= reset_price:
                             totaltime = time1 + totaltime
                             points = 0
                             increase_on_click = 1
                             clicks_per_second = 0
+                            auto1_bought = 0
+                            auto2_bought = 0
+                            auto3_bought = 0
                             isupgrade1 = False
                             isupgrade2 = False
                             isupgrade3 = False
