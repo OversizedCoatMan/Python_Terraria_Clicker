@@ -430,7 +430,7 @@ bonus3 = BUTTON(190, 270, wrath, 2.6, True)
 screen.blit(upgrade1btn.image, upgrade1btn.rect)
 screen.blit(statsbtn.image, statsbtn.rect)
 last_update_time = pygame.time.get_ticks()
-
+#
 running = True
 while running:
     clock.tick(60)
