@@ -12,15 +12,15 @@ pygame.display.set_caption("Clicker")
 
 con = sqlite3.connect("stats.db")
 cur = con.cursor()
-cur.execute("CREATE TABLE IF NOT EXISTS scores(points REAL, perclick REAL, cps REAL, totalclicks REAL, totaltime REAL, upgrade1 REAL, upgrade2 REAL,upgrade3 REAL, bonus1 REAL, bonus2 REAL, bonus3, upgrade1_price REAL, upgrade2_price REAL, upgrade3_price, auto1_price REAL, auto2_price REAL, auto3_price REAL, bonus1_price REAL, bonus2_price REAL, bonus3_price REAL, resets REAL, reset_price REAL, spent REAL, auto1_bought REAL, auto2_bought REAL, auto3_bought REAL, skillpoints REAL, strength_amount REAL)")
+cur.execute("CREATE TABLE IF NOT EXISTS scores(points REAL, perclick REAL, cps REAL, totalclicks REAL, totaltime REAL, upgrade1 REAL, upgrade2 REAL,upgrade3 REAL, bonus1 REAL, bonus2 REAL, bonus3, upgrade1_price REAL, upgrade2_price REAL, upgrade3_price, auto1_price REAL, auto2_price REAL, auto3_price REAL, bonus1_price REAL, bonus2_price REAL, bonus3_price REAL, resets REAL, reset_price REAL, spent REAL, auto1_bought REAL, auto2_bought REAL, auto3_bought REAL, skillpoints REAL, strength_amount REAL, auto_amount REAL)")
 
 
-cur.execute("SELECT points, perclick, cps, totalclicks, totaltime, upgrade1, upgrade2, upgrade3, bonus1, bonus2, bonus3, upgrade1_price, upgrade2_price, upgrade3_price, auto1_price, auto2_price, auto3_price, bonus1_price, bonus2_price, bonus3_price, resets, reset_price, spent , auto1_bought, auto2_bought, auto3_bought, skillpoints, strength_amount FROM scores ORDER BY rowid DESC LIMIT 1")
+cur.execute("SELECT points, perclick, cps, totalclicks, totaltime, upgrade1, upgrade2, upgrade3, bonus1, bonus2, bonus3, upgrade1_price, upgrade2_price, upgrade3_price, auto1_price, auto2_price, auto3_price, bonus1_price, bonus2_price, bonus3_price, resets, reset_price, spent , auto1_bought, auto2_bought, auto3_bought, skillpoints, strength_amount, auto_amount FROM scores ORDER BY rowid DESC LIMIT 1")
 row = cur.fetchone()
 
 
 if row:
-    points, increase_on_click, clicks_per_second, totalclicks, totaltime, isupgrade1, isupgrade2, isupgrade3, isbonus1, isbonus2, isbonus3, upgrade1_price, upgrade2_price, upgrade3_price, auto1_price, auto2_price, auto3_price, bonus1_price, bonus2_price, bonus3_price, resets, reset_price, spent, auto1_bought, auto2_bought, auto3_bought, skillpoints, strength_amount = row
+    points, increase_on_click, clicks_per_second, totalclicks, totaltime, isupgrade1, isupgrade2, isupgrade3, isbonus1, isbonus2, isbonus3, upgrade1_price, upgrade2_price, upgrade3_price, auto1_price, auto2_price, auto3_price, bonus1_price, bonus2_price, bonus3_price, resets, reset_price, spent, auto1_bought, auto2_bought, auto3_bought, skillpoints, strength_amount, auto_amount= row
     isupgrade1 = bool(isupgrade1)
     isupgrade2 = bool(isupgrade2)
     isupgrade3 = bool(isupgrade3)
@@ -40,8 +40,9 @@ if row:
     auto3_bought = int(auto3_bought)
     skillpoints = int(skillpoints)
     strength_amount = int(strength_amount)
+    auto_amount = int(auto_amount)
 else:
-    points = 0
+    points = 100000
     increase_on_click = 1
     clicks_per_second = 0
     totalclicks = 0
@@ -67,9 +68,9 @@ else:
     auto1_bought = 0
     auto2_bought = 0
     auto3_bought = 0
-    skillpoints = 0
+    skillpoints = 1
     strength_amount = 0
-
+    auto_amount = 0
 
 
 
@@ -357,12 +358,12 @@ class BUTTON:
                         not_enough = tk.Label(text="Not Enough Points", font = ("Arial", 16))
                         not_enough.pack(padx=10, pady=20)
                     def doreset():
-                        global  skillpoints, strength_amount, spent, points, increase_on_click, clicks_per_second, isbonus1, isbonus2, isbonus3, isupgrade1, isupgrade2, isupgrade3, upgrade1_price, upgrade2_price, upgrade3_price, auto1_price, auto2_price, auto3_price, bonus1_price, bonus2_price, bonus3_price, resets, reset_price, reset_window, run, totaltime, time1, auto1_bought, auto2_bought, auto3_bought
+                        global  skillpoints, auto_amount, strength_amount, spent, points, increase_on_click, clicks_per_second, isbonus1, isbonus2, isbonus3, isupgrade1, isupgrade2, isupgrade3, upgrade1_price, upgrade2_price, upgrade3_price, auto1_price, auto2_price, auto3_price, bonus1_price, bonus2_price, bonus3_price, resets, reset_price, reset_window, run, totaltime, time1, auto1_bought, auto2_bought, auto3_bought
                         if points >= reset_price:
                             totaltime = time1 + totaltime
                             points = 0
                             increase_on_click = 1 + strength_amount
-                            clicks_per_second = 0
+                            clicks_per_second = 0 + auto_amount
                             auto1_bought = 0
                             auto2_bought = 0
                             auto3_bought = 0
@@ -411,9 +412,16 @@ class BUTTON:
                 skillpoints -= 1
                 strength_amount += 1
                 strength_amount = int(strength_amount)
-                increase_on_click += strength_amount
+                increase_on_click += 1
+        def skillauto():
+            global skillpoints, clicks_per_second, auto_amount
+            if skillpoints >= 1:
+                skillpoints -= 1
+                auto_amount += 5
+                auto_amount = int(auto_amount)
+                clicks_per_second += 5
 
-        global skillpoints, pos, strength_amount
+        global skillpoints, pos, strength_amount, auto_amount
 
         for event in events:
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.rect.collidepoint(pos):
@@ -429,6 +437,11 @@ class BUTTON:
                 strength.pack(padx=10, pady=10, side="left", anchor="n")
                 skill1 = tk.Label(skillmenu, text= "+1 On Click", font=("Arial", 18))
                 skill1.pack(padx=10, pady=10, side="left", anchor="n")
+                autoskill = tk.Button(skillmenu, text=f"Auto|{auto_amount/5}", font=("Arial", 18), command = skillauto)
+                autoskill.pack(padx=10, pady=10, side="left", anchor="n")
+                skill2 = tk.Label(skillmenu, text="+5 CPS", font=("Arial", 18))
+                skill2.pack(padx=10, pady=10, side="left", anchor="n")
+
 
 
                 skillmenu.mainloop()
@@ -463,12 +476,12 @@ while running:
         if event.type == pygame.QUIT or running==False:
             totaltime = time1 + totaltime
             cur.execute(
-                "INSERT INTO scores (points, perclick, cps, totalclicks, totaltime, upgrade1, upgrade2, upgrade3, bonus1, bonus2, bonus3, upgrade1_price, upgrade2_price, upgrade3_price, auto1_price, auto2_price, auto3_price, bonus1_price, bonus2_price, bonus3_price, resets, reset_price, spent, auto1_bought, auto2_bought, auto3_bought, skillpoints, strength_amount) "
-                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO scores (points, perclick, cps, totalclicks, totaltime, upgrade1, upgrade2, upgrade3, bonus1, bonus2, bonus3, upgrade1_price, upgrade2_price, upgrade3_price, auto1_price, auto2_price, auto3_price, bonus1_price, bonus2_price, bonus3_price, resets, reset_price, spent, auto1_bought, auto2_bought, auto3_bought, skillpoints, strength_amount, auto_amount) "
+                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 (points, increase_on_click, clicks_per_second, totalclicks, totaltime, isupgrade1,
                  isupgrade2, isupgrade3, isbonus1, isbonus2, isbonus3, upgrade1_price, upgrade2_price, upgrade3_price,
                  auto1_price, auto2_price, auto3_price, bonus1_price, bonus2_price, bonus3_price, resets, reset_price, spent,
-                 auto1_bought, auto2_bought, auto3_bought, skillpoints, strength_amount))
+                 auto1_bought, auto2_bought, auto3_bought, skillpoints, strength_amount, auto_amount))
             con.commit()
             running = False
 
