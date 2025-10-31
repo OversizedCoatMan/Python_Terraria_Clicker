@@ -43,7 +43,7 @@ if row:
     strength_amount = int(strength_amount)
     auto_amount = int(auto_amount)
 else:
-    points = 100000
+    points = 0
     increase_on_click = 1
     clicks_per_second = 0
     totalclicks = 0
@@ -71,7 +71,7 @@ else:
     auto1_bought = 0
     auto2_bought = 0
     auto3_bought = 0
-    skillpoints = 1
+    skillpoints = 0
     strength_amount = 0
     auto_amount = 0
 
